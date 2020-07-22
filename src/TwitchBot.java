@@ -4,14 +4,14 @@ import java.io.IOException;
 
 /**
  * @author Jack Pullman
- * @version 1.0
+ * @version 1.1
  */
 public class TwitchBot extends PircBot {
 
 	// Fields
 	String fileName = "botData.json";
 	JSONEditor editor;
-	public static final String broadcaster = "CaptainJack99";
+	String[] recordKeys = { "wins", "losses" };
 
 	public TwitchBot() throws IOException {
 		this.setName("the_captain_bot");
@@ -48,6 +48,8 @@ public class TwitchBot extends PircBot {
 				if (Commands.isBroadcaster(sender)) {
 					Commands.unaryCommand("wins", true, editor);
 					sendMessage(channel, "Win has been added to the record.");
+
+					editor.export("record.txt", recordKeys, "RECORD: ");
 					break;
 				} else {
 					sendMessage(channel, "@" + sender + ", you are not authorized to use this command.");
@@ -57,6 +59,7 @@ public class TwitchBot extends PircBot {
 				if (Commands.isBroadcaster(sender)) {
 					Commands.unaryCommand("wins", false, editor);
 					sendMessage(channel, "Win has been subtracted from the record.");
+					editor.export("record.txt", recordKeys, "RECORD: ");
 					break;
 				} else {
 					sendMessage(channel, "@" + sender + ", you are not authorized to use this command.");
@@ -66,6 +69,7 @@ public class TwitchBot extends PircBot {
 				if (Commands.isBroadcaster(sender)) {
 					Commands.unaryCommand("losses", true, editor);
 					sendMessage(channel, "Loss has been added to the record.");
+					editor.export("record.txt", recordKeys, "RECORD: ");
 					break;
 				} else {
 					sendMessage(channel, "@" + sender + ", you are not authorized to use this command.");
@@ -75,6 +79,7 @@ public class TwitchBot extends PircBot {
 				if (Commands.isBroadcaster(sender)) {
 					Commands.unaryCommand("losses", false, editor);
 					sendMessage(channel, "Loss has been subtracted from the record.");
+					editor.export("record.txt", recordKeys, "RECORD: ");
 					break;
 				} else {
 					sendMessage(channel, "@" + sender + ", you are not authorized to use this command.");
@@ -90,6 +95,7 @@ public class TwitchBot extends PircBot {
 					Commands.setCommand("wins", 0, editor, JSONEditor.type.Number);
 					Commands.setCommand("losses", 0, editor, JSONEditor.type.Number);
 					sendMessage(channel, "The record has been reset.");
+					editor.export("record.txt", recordKeys, "RECORD: ");
 					break;
 				} else {
 					sendMessage(channel, "@" + sender + ", you are not authorized to use this command.");
