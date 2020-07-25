@@ -22,4 +22,20 @@ public class Commands {
 		var = increment ? (var + 1) : (var - 1);
 		setCommand(fieldName, var, editor, JSONEditor.type.Number);
 	}
+
+	static String handleMistakes(long numMistakes) {
+		if (numMistakes <= 5) {
+			return "Do better.";
+		} else if (numMistakes <= 10) {
+			return "Come on now, haven't we talked about this?";
+		} else if (numMistakes <= 15) {
+			return "I am convinced you are doing this on purpose.";
+		} else if (numMistakes <= 20) {
+			return "You should probably gift a sub or something cuz you sound pretty gullible.";
+		} else if (numMistakes <= 25) {
+			return "You are breaking my heart, you should go. BibleThump";
+		} else {
+			return "I am done with you, time to walk the plank.";
+		}
+	}
 }
