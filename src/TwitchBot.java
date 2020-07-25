@@ -134,6 +134,10 @@ public class TwitchBot extends PircBot {
 			case "rank":
 				sendMessage(channel, "GOLD 1");
 				break;
+				
+			case "help":
+				sendMessage(channel, sender + " The_Captain_Bot Commands: https://bit.ly/3eYCa27");
+				break;
 
 			default:
 				Commands.unaryCommand(sender + "_mistakes", true, editor);

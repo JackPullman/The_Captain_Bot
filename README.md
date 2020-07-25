@@ -17,3 +17,4 @@ Current Commands:
 | spotify     | Everyone         | Responds in chat with a link to my Spotify playlist                              |
 | socials     | Everyone         | Responds in chat with a link to my social media accounts                         |
 | rank        | Everyone         | Responds in chat with my current rank                                            |
+| help        | Everyone         | Responds in chat with a link to this document                                    |
