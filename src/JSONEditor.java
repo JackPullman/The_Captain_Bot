@@ -8,6 +8,9 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+/**
+ * @author Jack Pullman
+ */
 public class JSONEditor {
 
 	// Fields
@@ -33,6 +36,7 @@ public class JSONEditor {
 			botDataFile.createNewFile();
 			fw = new FileWriter("botData.json");
 		} catch (ParseException e) {
+			System.err.println("Parse Failed");
 			e.printStackTrace();
 		}
 	}
@@ -99,7 +103,7 @@ public class JSONEditor {
 
 	static void onDisconnect() {
 		try {
-			fw = new FileWriter("botData.json", false);
+			fw = new FileWriter(new File(TwitchBotMain.exportPath + "Backup\\backupData.json"), false);
 			fw.write(botData.toJSONString());
 			fw.close();
 		} catch (IOException e) {

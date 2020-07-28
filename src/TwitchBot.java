@@ -4,7 +4,7 @@ import java.io.IOException;
 
 /**
  * @author Jack Pullman
- * @version 1.1
+ * @version 1.2
  */
 public class TwitchBot extends PircBot {
 
@@ -12,6 +12,9 @@ public class TwitchBot extends PircBot {
 	String fileName = "botData.json";
 	JSONEditor editor;
 	String[] recordKeys = { "wins", "losses" };
+	String[] valRanks = { "IRON 1", "IRON 2", "IRON 3", "BRONZE 1", "BRONZE 2", "BRONZE 3", "SILVER 1", "SILVER 2",
+			"SILVER 3", "GOLD 1", "GOLD 2", "GOLD 3", "PLATINUM 1", "PLATINUM 2", "PLATINUM 3", "DIAMOND 1",
+			"DIAMOND 2", "DIAMOND 3", "IMMORTAL 1", "IMMORTAL 2", "IMMORTAL 3", "RADIANT" };
 
 	public TwitchBot() throws IOException {
 		setName("the_captain_bot");
@@ -22,7 +25,7 @@ public class TwitchBot extends PircBot {
 		if (message.substring(0, 1).equals("!")) {
 			String command = message.substring(1);
 			switch (command.toLowerCase()) {
-			
+
 			/**
 			 * @AccessLevel Broadcaster
 			 * @Description Disconnects the TwitchBot from Twitch, sends a confirmation
@@ -43,23 +46,24 @@ public class TwitchBot extends PircBot {
 			/**
 			 * @AccessLevel Broadcaster
 			 * @Description Increments or decrements the win or loss counter and sends
-			 *              confirmation
+			 *              confirmation, unless wins or losses would be less than zero
 			 */
 			case "+win":
 				if (Commands.isBroadcaster(sender)) {
-					Commands.unaryCommand("wins", true, editor);
-					sendMessage(channel, "Win has been added to the record.");
-
-					editor.export("record.txt", recordKeys, "RECORD: ");
+					if (Commands.unaryCommand("wins", true, 0, -1, editor)) {
+						sendMessage(channel, "Win has been added to the record.");
+						editor.export("record.txt", recordKeys, "RECORD: ");
+					}
 					break;
 				}
 				unauthorized(channel, sender);
 				break;
 			case "-win":
 				if (Commands.isBroadcaster(sender)) {
-					Commands.unaryCommand("wins", false, editor);
-					sendMessage(channel, "Win has been subtracted from the record.");
-					editor.export("record.txt", recordKeys, "RECORD: ");
+					if (Commands.unaryCommand("wins", false, 0, -1, editor)) {
+						sendMessage(channel, "Win has been subtracted from the record.");
+						editor.export("record.txt", recordKeys, "RECORD: ");
+					}
 					break;
 				}
 				unauthorized(channel, sender);
@@ -67,9 +71,10 @@ public class TwitchBot extends PircBot {
 
 			case "+loss":
 				if (Commands.isBroadcaster(sender)) {
-					Commands.unaryCommand("losses", true, editor);
-					sendMessage(channel, "Loss has been added to the record.");
-					editor.export("record.txt", recordKeys, "RECORD: ");
+					if (Commands.unaryCommand("losses", true, 0, -1, editor)) {
+						sendMessage(channel, "Loss has been added to the record.");
+						editor.export("record.txt", recordKeys, "RECORD: ");
+					}
 					break;
 				}
 				unauthorized(channel, sender);
@@ -77,9 +82,10 @@ public class TwitchBot extends PircBot {
 
 			case "-loss":
 				if (Commands.isBroadcaster(sender)) {
-					Commands.unaryCommand("losses", false, editor);
-					sendMessage(channel, "Loss has been subtracted from the record.");
-					editor.export("record.txt", recordKeys, "RECORD: ");
+					if (Commands.unaryCommand("losses", false, 0, -1, editor)) {
+						sendMessage(channel, "Loss has been subtracted from the record.");
+						editor.export("record.txt", recordKeys, "RECORD: ");
+					}
 					break;
 				}
 				unauthorized(channel, sender);
@@ -101,11 +107,46 @@ public class TwitchBot extends PircBot {
 				break;
 
 			/**
+			 * @AccessLevel Broadcaster
+			 * @Description Increments and decrements the rankIndex and then updates the
+			 *              rank, unless rankIndex would be less than zero
+			 */
+			case "+rank":
+				if (Commands.isBroadcaster(sender)) {
+					if (Commands.unaryCommand("rankIndex", true, 0, -1, editor)) {
+						Commands.setCommand("rank",
+								valRanks[Math.toIntExact(
+										(long) Commands.getCommand("rankIndex", editor, JSONEditor.type.Number))],
+								editor, JSONEditor.type.String);
+						sendMessage(channel, "RANK UP!");
+						editor.export("rank.txt", new String[] { "rank" }, "RANK: ");
+					}
+					break;
+				}
+				unauthorized(channel, sender);
+				break;
+
+			case "-rank":
+				if (Commands.isBroadcaster(sender)) {
+					if (Commands.unaryCommand("rankIndex", false, 0, -1, editor)) {
+						Commands.setCommand("rank",
+								valRanks[Math.toIntExact(
+										(long) Commands.getCommand("rankIndex", editor, JSONEditor.type.Number))],
+								editor, JSONEditor.type.String);
+						sendMessage(channel, "RANK DOWN :(");
+						editor.export("rank.txt", new String[] { "rank" }, "RANK: ");
+					}
+					break;
+				}
+				unauthorized(channel, sender);
+				break;
+
+			/**
 			 * @AccessLevel Everyone
 			 * @Description Increments the 'plank' counter and sends the current plank count
 			 */
 			case "plank":
-				Commands.unaryCommand("plank", true, editor);
+				Commands.unaryCommand("plank", true, 0, -1, editor);
 				sendMessage(channel, sender + ", CaptainJack has planked " + editor.getValue("plank") + " times.");
 				break;
 
@@ -118,7 +159,16 @@ public class TwitchBot extends PircBot {
 				long losses = (long) Commands.getCommand("losses", editor, JSONEditor.type.Number);
 				sendMessage(channel, sender + ", " + wins + "-" + losses);
 				break;
-				
+
+			/**
+			 * @AccessLevel Everyone
+			 * @Description Sends the current rank by ranked index from JSON
+			 */
+			case "rank":
+				long rank = (long) Commands.getCommand("rankIndex", editor, JSONEditor.type.Number);
+				sendMessage(channel, valRanks[Math.toIntExact(rank)]);
+				break;
+
 			/**
 			 * @AccessLevel Everyone
 			 * @Description Predefined responses to commands, no back end
@@ -126,24 +176,21 @@ public class TwitchBot extends PircBot {
 			case "spotify":
 				sendMessage(channel, "Listen along to my liked songs with me: https://spoti.fi/2Ec8B0g");
 				break;
-				
+
 			case "socials":
-				sendMessage(channel, "Follow me on Social Media! https://twitter.com/jpullman13 https://www.instagram.com/jpullman13/");
+				sendMessage(channel,
+						"Follow me on Social Media! https://twitter.com/jpullman13 https://www.instagram.com/jpullman13/");
 				break;
-				
-			case "rank":
-				sendMessage(channel, "GOLD 1");
-				break;
-				
+
 			case "help":
 				sendMessage(channel, sender + " The_Captain_Bot Commands: https://bit.ly/3eYCa27");
 				break;
 
 			default:
-				Commands.unaryCommand(sender + "_mistakes", true, editor);
+				Commands.unaryCommand(sender + "_mistakes", true, -1, -1, editor);
 				long mistakes = (long) Commands.getCommand(sender + "_mistakes", editor, JSONEditor.type.Number);
 				sendMessage(channel, sender + ", " + "you have attempted " + mistakes + " failed commands. "
-						+ Commands.handleMistakes(mistakes));
+						+ Commands.handleCommandMistakes(mistakes));
 				break;
 			}
 		}

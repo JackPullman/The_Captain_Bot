@@ -4,7 +4,6 @@ import org.json.simple.parser.JSONParser;
 
 /**
  * @author Jack Pullman
- *
  */
 public class TwitchBotMain {
 
@@ -17,8 +16,8 @@ public class TwitchBotMain {
 	static String exportPath;
 
 	public static void main(String[] args) throws Exception {
-		TwitchBot bot = new TwitchBot();
 		setEnvVar();
+		TwitchBot bot = new TwitchBot();
 		bot.setVerbose(true);
 		bot.connect(hostName, Math.toIntExact(port), oauth);
 		bot.joinChannel(twitchChannel);
@@ -28,8 +27,8 @@ public class TwitchBotMain {
 		}
 		bot.sendMessage(twitchChannel, bot.getName() + " is connected");
 	}
-	
-	private static void setEnvVar()  throws Exception{
+
+	private static void setEnvVar() throws Exception {
 		FileReader reader = new FileReader("env.json");
 		Object obj = new JSONParser().parse(reader);
 		JSONObject envData = (JSONObject) obj;
