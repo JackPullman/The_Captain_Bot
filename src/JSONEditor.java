@@ -23,6 +23,12 @@ public class JSONEditor {
 		Number, String
 	};
 
+	/**
+	 * Default constructor for JSONEditor. Opens FileReader and FileWriter for
+	 * botData, creating designated JSON if it does not exist
+	 * 
+	 * @param file the JSON which is being manipulated by the JSONEditor instance
+	 */
 	public JSONEditor(String file) throws IOException {
 		fileName = file;
 		try {
@@ -41,6 +47,10 @@ public class JSONEditor {
 		}
 	}
 
+	/**
+	 * Function with package-wide static access. Writes the JSON object to file and
+	 * then rereads the JSON file to the Object instance
+	 */
 	void updateJSON() {
 		try {
 			fw = new FileWriter("botData.json", false);
@@ -54,6 +64,14 @@ public class JSONEditor {
 		}
 	}
 
+	/**
+	 * Checks for and returns the value corresponding to key key with type dataType
+	 * 
+	 * @param key      the key whose value is returned once it is checked for and
+	 *                 populated if missing
+	 * @param dataType the expected value type for casting
+	 * @return the value corresponding to key once it is autopopulated if missing
+	 */
 	@SuppressWarnings("unchecked")
 	Object checkField(String key, type dataType) {
 		if (!botData.containsKey(key)) {
@@ -67,6 +85,13 @@ public class JSONEditor {
 		return botData.get(key);
 	}
 
+	/**
+	 * Updates the value of key key with value value of type dataType
+	 * 
+	 * @param key      the key whose value is updated to be value
+	 * @param value    the value assigned to key key
+	 * @param dataType the expected value type for casting
+	 */
 	@SuppressWarnings("unchecked")
 	void updateField(String key, Object value, type dataType) {
 		if (dataType.equals(type.Number)) {
@@ -80,6 +105,15 @@ public class JSONEditor {
 		return botData.get(key);
 	}
 
+	/**
+	 * Creates a txt file named exportFileName at the path specified in env.json
+	 * containing the value corresponding to keys (connected by hyphen if multiple
+	 * values), preceded by pretext if applicable
+	 * 
+	 * @param exportFileName the name of the txt file the value(s) are exported to
+	 * @param keys           the key(s) whose values are exported
+	 * @param pretext        the text that is added to the file before the value(s)
+	 */
 	void export(String exportFileName, String[] keys, String pretext) {
 		if (!TwitchBotMain.export)
 			return;
@@ -101,6 +135,10 @@ public class JSONEditor {
 		}
 	}
 
+	/**
+	 * Disconnect handling: Writes the current botData to a backup JSON and
+	 * gracefully exits the program after notifying the channel chat
+	 */
 	static void onDisconnect() {
 		try {
 			fw = new FileWriter(new File(TwitchBotMain.exportPath + "Backup\\backupData.json"), false);

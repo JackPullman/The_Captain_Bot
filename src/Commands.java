@@ -3,19 +3,52 @@
  */
 public class Commands {
 
+	/**
+	 * Determines if message sender is broadcaster as defined by env.json
+	 * 
+	 * @param user the user that is determined whether they are broadcaster
+	 * @return whether the calling user is the broadcaster
+	 */
 	static boolean isBroadcaster(String user) {
 		return user.equalsIgnoreCase(TwitchBotMain.broadcaster);
 	}
 
+	/**
+	 * Returns the value corresponding to fieldName
+	 * 
+	 * @param fieldName the key whose value is returned
+	 * @param editor    the bot's editor instance
+	 * @param dataType  the expected value type for casting
+	 * @return the value corresponding to fieldName
+	 */
 	static Object getCommand(String fieldName, JSONEditor editor, JSONEditor.type dataType) {
 		return editor.checkField(fieldName, dataType);
 	}
 
+	/**
+	 * Sets the value of the key fieldName to be value
+	 * 
+	 * @param fieldName the key whose value is assigned
+	 * @param value     the value to be assigned to fieldName
+	 * @param editor    the bot's editor instance
+	 * @param dataType  the expected value type for casting
+	 */
 	static void setCommand(String fieldName, Object value, JSONEditor editor, JSONEditor.type dataType) {
 		editor.updateField(fieldName, value, dataType);
 		editor.updateJSON();
 	}
 
+	/**
+	 * Increments or decrements the value of the numeric key corresponding to
+	 * fieldName
+	 * 
+	 * @param fieldName  the key whose value is incremented or decremented
+	 * @param increment  true for increment, false for decrement
+	 * @param lowerLimit the lower limit to which the value can be decremented to
+	 * @param upperLimit the upper limit to which the value can be incremented to
+	 * @param editor     the bot's editor instance
+	 * @return whether the increment/decrement was successful due to limits
+	 */
 	static boolean unaryCommand(String fieldName, boolean increment, int lowerLimit, int upperLimit,
 			JSONEditor editor) {
 		long var = (long) editor.checkField(fieldName, JSONEditor.type.Number);

@@ -21,6 +21,9 @@ public class TwitchBot extends PircBot {
 		editor = new JSONEditor(fileName);
 	}
 
+	/**
+	 * Handles the bot's response to messages in channel chat
+	 */
 	public void onMessage(String channel, String sender, String login, String hostname, String message) {
 		if (message.substring(0, 1).equals("!")) {
 			String command = message.substring(1);
@@ -186,6 +189,9 @@ public class TwitchBot extends PircBot {
 				sendMessage(channel, sender + " The_Captain_Bot Commands: https://bit.ly/3eYCa27");
 				break;
 
+			/**
+			 * @Description Tracks and handles unsupported commands
+			 */
 			default:
 				Commands.unaryCommand(sender + "_mistakes", true, -1, -1, editor);
 				long mistakes = (long) Commands.getCommand(sender + "_mistakes", editor, JSONEditor.type.Number);
